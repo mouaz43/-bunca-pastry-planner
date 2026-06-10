@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BUNCA · Pastry Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F1E8; --paper:#FDFBF7; --espresso:#2C2017; --mocha:#6B4F3A;
+    --caramel:#B07B43; --latte:#E8DCCB; --sand:#EFE7DA; --faint:#9C8B79;
+    --warn:#A4543B; --good:#5E7350;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--espresso);font-family:'Plus Jakarta Sans',sans-serif;
+       -webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+ 
+  /* Header */
+  header{padding:34px 0 22px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+  .brand .mark{font-weight:700;letter-spacing:.42em;font-size:13px}
+  .brand .sub{font-size:9.5px;letter-spacing:.18em;color:var(--faint);margin-top:4px;text-transform:uppercase}
+  .brand .rule{width:30px;height:2px;background:var(--caramel);margin-top:10px}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:44px;line-height:1.02;margin-top:18px}
+  h1 em{font-style:italic;color:var(--caramel);font-weight:500}
+  .month{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--caramel);font-size:19px;margin-top:6px}
+ 
+  /* Controls */
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 26px}
+  select,.btn{appearance:none;-webkit-appearance:none;font-family:inherit;font-size:13px;font-weight:500;
+    border:1px solid var(--latte);background:var(--paper);color:var(--espresso);
+    border-radius:10px;padding:11px 16px;cursor:pointer;transition:border-color .15s}
+  select:hover,.btn:hover{border-color:var(--caramel)}
+  select{padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B07B43' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center}
+  .btn.primary{background:var(--espresso);color:var(--cream);border-color:var(--espresso)}
+  .btn.primary:hover{background:var(--mocha);border-color:var(--mocha)}
+  label.ctl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--caramel);font-weight:600;
+    display:flex;flex-direction:column;gap:5px}
+  label.ctl input{width:78px;font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--latte);
+    background:var(--paper);border-radius:10px;padding:10px 12px;color:var(--espresso)}
+  label.ctl input:focus{outline:none;border-color:var(--caramel)}
+ 
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:20px}
+  .tab{font-size:12px;font-weight:600;letter-spacing:.06em;padding:10px 20px;border-radius:999px;
+    border:1px solid var(--latte);background:transparent;color:var(--mocha);cursor:pointer;font-family:inherit}
+  .tab.active{background:var(--espresso);color:var(--cream);border-color:var(--espresso)}
+ 
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:26px}
+  .kpi{background:var(--paper);border:1px solid var(--latte);border-radius:14px;padding:16px 16px 14px}
+  .kpi .k{font-size:9px;letter-spacing:.14em;color:var(--caramel);font-weight:600;text-transform:uppercase}
+  .kpi .v{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:30px;margin-top:6px;line-height:1}
+  .kpi .s{font-size:10px;color:var(--faint);margin-top:7px}
+ 
+  /* Section label */
+  .sec{font-size:10px;letter-spacing:.14em;color:var(--caramel);font-weight:600;text-transform:uppercase;margin:26px 0 10px}
+ 
+  /* Table */
+  .tablecard{background:var(--paper);border:1px solid var(--latte);border-radius:14px;overflow:auto}
+  table{width:100%;border-collapse:collapse;min-width:780px}
+  thead th{background:var(--espresso);color:var(--cream);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+    font-weight:600;padding:12px 12px;text-align:center;white-space:nowrap}
+  thead th:first-child{text-align:left;padding-left:18px;border-radius:0}
+  tbody td{padding:9px 12px;font-size:13px;text-align:center;border-bottom:1px solid var(--sand);white-space:nowrap}
+  tbody tr:nth-child(odd) td{background:var(--sand)}
+  tbody tr:last-child td{border-bottom:none}
+  td.name{text-align:left;padding-left:18px;font-weight:500}
+  td.name .unit{display:block;font-size:9.5px;color:var(--faint);font-weight:400;margin-top:1px}
+  td input{width:64px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;
+    border:1px solid var(--latte);background:#fff;border-radius:8px;padding:6px 4px;color:var(--espresso)}
+  td input:focus{outline:none;border-color:var(--caramel)}
+  td .factor{font-weight:600}
+  td .factor.hot{color:var(--warn)}
+  td .factor.cool{color:var(--faint)}
+  td .soll{font-weight:600}
+  td .ganze{display:block;font-size:10px;color:var(--caramel);font-weight:600;margin-top:2px}
+ 
+  .legend{font-size:10.5px;color:var(--faint);margin:10px 4px 0;line-height:1.7}
+ 
+  /* Notice */
+  .notice{background:var(--sand);border:1px solid var(--latte);border-radius:14px;padding:18px 20px;
+    font-size:13px;color:var(--mocha);line-height:1.65;margin-top:18px}
+  .notice b{color:var(--espresso)}
+  .empty{padding:54px 20px;text-align:center;color:var(--faint)}
+  .empty .big{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--mocha);margin-bottom:8px}
+ 
+  footer{margin-top:46px;border-top:1px solid var(--latte);padding-top:14px;display:flex;
+    justify-content:space-between;font-size:9.5px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+ 
+  /* Print */
+  @media print{
+    body{background:#fff;padding:0}
+    .controls,.tabs,.btn{display:none!important}
+    .tablecard{border-color:#ddd;overflow:visible}
+    td input{border:none;background:transparent}
+    @page{margin:14mm}
+  }
+  @media(max-width:640px){h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark">B U N C A</div>
+      <div class="sub">Specialty Coffee · Frankfurt am Main</div>
+      <div class="rule"></div>
+      <h1>Pastry <em>Planner</em></h1>
+      <div class="month" id="monthLabel">Datenbasis: Mai 2026</div>
+    </div>
+    <div class="controls">
+      <label class="ctl">Filiale
+        <select id="shopSelect"></select>
+      </label>
+      <label class="ctl">Puffer Di/Do %
+        <input type="number" id="pufWT" value="10" min="0" max="50">
+      </label>
+      <label class="ctl">Puffer Samstag %
+        <input type="number" id="pufSA" value="15" min="0" max="50">
+      </label>
+      <label class="ctl">&nbsp;
+        <button class="btn primary" onclick="window.print()">Als PDF drucken</button>
+      </label>
+    </div>
+  </header>
+ 
+  <div class="tabs">
+    <button class="tab active" data-tab="pastry">Pastry</button>
+    <button class="tab" data-tab="coffee">Kaffee</button>
+  </div>
+ 
+  <div id="view"></div>
+ 
+  <footer>
+    <span>BUNCA Coffee · Frankfurt</span>
+    <span>Pastry Planner · Standard</span>
+  </footer>
+</div>
+ 
+<script>
+/* ============================================================
+   DATEN — pro Filiale & Artikel: Ø Wochentag (Di–Fr), Ø Wochenende (Sa–Mo)
+   per = Stück pro Ganzem (null = wird in Stück bestellt)
+   Mai 2026 · Grüneburgweg: WT 17 Tage, WE 14 Tage, inkl. verkaufte Ganze
+============================================================ */
+const SHOPS = {
+  "grueneburgweg": {
+    label: "Grüneburgweg",
+    month: "Mai 2026",
+    items: [
+      {name:"Bananabread",            awt:62.0, awe:70.3, per:7},
+      {name:"Veganes Bananabread",    awt:20.0, awe:23.9, per:7},
+      {name:"Pasteis de Nata",        awt:18.1, awe:23.4, per:null},
+      {name:"Pistachio Lemon Cookie", awt:17.2, awe:19.0, per:null},
+      {name:"Carrot Cake",            awt:12.9, awe:15.2, per:null},
+      {name:"Lemon Cake",             awt:12.7, awe:16.6, per:null},
+      {name:"Peanut Caramel Cookie",  awt:12.6, awe:13.4, per:null},
+      {name:"Choc Chip Cookie",       awt:11.6, awe:12.4, per:null},
+      {name:"Red Velvet Cookie",      awt:10.6, awe:11.3, per:null},
+      {name:"Muffin",                 awt:10.6, awe:12.4, per:null},
+      {name:"Energy Ball",            awt:9.2,  awe:12.5, per:null},
+      {name:"Veganer Kuchen",         awt:8.0,  awe:12.9, per:8},
+      {name:"Oatmeal Cookie",         awt:7.1,  awe:7.2,  per:null},
+    ]
+  },
+  "city":   { label:"City",   month:null, items:[] },
+  "berger": { label:"Berger", month:null, items:[] },
+};
+ 
+let currentShop = "grueneburgweg";
+let currentTab  = "pastry";
+ 
+const fmt1 = n => n.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmt2 = n => n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2});
+ 
+function calcRow(it, pWT, pSA){
+  const f    = it.awt > 0 ? it.awe/it.awt : 0;
+  const sWT  = Math.ceil(2*it.awt*(1+pWT));
+  const sSA  = Math.ceil(3*it.awe*(1+pSA));
+  const gWT  = it.per ? Math.ceil(sWT/it.per) : null;
+  const gSA  = it.per ? Math.ceil(sSA/it.per) : null;
+  return {f,sWT,sSA,gWT,gSA};
+}
+ 
+function render(){
+  const shop = SHOPS[currentShop];
+  const view = document.getElementById("view");
+  document.getElementById("monthLabel").textContent =
+    shop.month ? `Datenbasis: ${shop.month}` : "Noch keine Datenbasis";
+ 
+  if(currentTab === "coffee"){
+    view.innerHTML = `<div class="tablecard"><div class="empty">
+      <div class="big">Kaffee folgt</div>
+      Artikelliste & Bestelllogik für Kaffee werden als eigener Abschnitt ergänzt —<br>
+      dieselbe Systematik: Ø-Verbrauch, Lieferintervalle, Umrechnung in Bestelleinheiten.
+    </div></div>`;
+    return;
+  }
+ 
+  if(!shop.items.length){
+    view.innerHTML = `<div class="tablecard"><div class="empty">
+      <div class="big">${shop.label} — ab Juni im Planner</div>
+      Sobald die helloTESS-Auswertung für ${shop.label} vorliegt, erscheinen hier<br>
+      alle Artikel mit Ø-Werten und fertigen Soll-Beständen.
+    </div></div>`;
+    return;
+  }
+ 
+  const pWT = (parseFloat(document.getElementById("pufWT").value)||0)/100;
+  const pSA = (parseFloat(document.getElementById("pufSA").value)||0)/100;
+ 
+  let totWT=0, totWE=0;
+  shop.items.forEach(it=>{ totWT+=it.awt; totWE+=it.awe; });
+ 
+  let rows = "";
+  shop.items.forEach((it,i)=>{
+    const r = calcRow(it,pWT,pSA);
+    const fClass = r.f>=1.25 ? "hot" : (r.f<=1.05 ? "cool" : "");
+    rows += `<tr>
+      <td class="name">${it.name}${it.per?`<span class="unit">Ganzes = ${it.per} Stück</span>`:""}</td>
+      <td><input type="number" step="0.1" value="${it.awt.toFixed(1)}" onchange="upd(${i},'awt',this.value)"></td>
+      <td><input type="number" step="0.1" value="${it.awe.toFixed(1)}" onchange="upd(${i},'awe',this.value)"></td>
+      <td><span class="factor ${fClass}">${fmt2(r.f)}</span></td>
+      <td><span class="soll">${r.sWT} St.</span>${r.gWT?`<span class="ganze">${r.gWT} Ganze</span>`:""}</td>
+      <td><span class="soll">${r.sWT} St.</span>${r.gWT?`<span class="ganze">${r.gWT} Ganze</span>`:""}</td>
+      <td><span class="soll">${r.sSA} St.</span>${r.gSA?`<span class="ganze">${r.gSA} Ganze = ${r.gSA*it.per} St.</span>`:""}</td>
+    </tr>`;
+  });
+ 
+  view.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="k">Ø Wochentag</div><div class="v">${Math.round(totWT)}</div><div class="s">Stück/Tag · Di–Fr</div></div>
+      <div class="kpi"><div class="k">Ø Wochenende</div><div class="v">${Math.round(totWE)}</div><div class="s">Stück/Tag · Sa–Mo</div></div>
+      <div class="kpi"><div class="k">WE-Faktor gesamt</div><div class="v">${fmt2(totWE/totWT)}</div><div class="s">Wochenende ÷ Wochentag</div></div>
+      <div class="kpi"><div class="k">Artikel</div><div class="v">${shop.items.length}</div><div class="s">aktives Pastry-Sortiment</div></div>
+    </div>
+ 
+    <div class="sec">Soll-Bestände · ${shop.label} — Ø-Werte anpassbar, alles rechnet live</div>
+    <div class="tablecard">
+      <table>
+        <thead><tr>
+          <th>Produkt</th><th>Ø Di–Fr</th><th>Ø Sa–Mo</th><th>WE-Faktor</th>
+          <th>Soll Di</th><th>Soll Do</th><th>Soll Sa</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="legend">
+      Soll Di/Do = 2 × Ø Wochentag × (1 + Puffer) &nbsp;·&nbsp; Soll Sa = 3 × Ø Wochenende × (1 + Puffer Samstag)
+      &nbsp;·&nbsp; Ganze = aufrunden( Stück ÷ Stück pro Ganzem ).<br>
+      WE-Faktor <span style="color:var(--warn);font-weight:600">rot</span> = starkes Wochenend-Produkt (≥ 1,25)
+      &nbsp;·&nbsp; <span style="font-weight:600;color:var(--faint)">grau</span> = nahezu flach (≤ 1,05).
+    </div>
+ 
+    <div class="notice">
+      <b>Hinweise Mai:</b> Veganer Kuchen hat den höchsten WE-Faktor (1,62) — Samstag-Soll unbedingt auf 6 Ganze halten.
+      Energy Ball (+36&nbsp;%) und Lemon Cake (+30&nbsp;%) ebenfalls wochenendstark. Cookies laufen flach — kein Wochenend-Aufschlag nötig.
+      Werte sind Mai-Basis ohne Waste-/Sold-out-Daten; Änderungen hier gelten nur für diese Sitzung.
+    </div>`;
+}
+ 
+function upd(i, key, val){
+  const v = parseFloat(String(val).replace(",","."));
+  if(!isNaN(v) && v>=0) SHOPS[currentShop].items[i][key]=v;
+  render();
+}
+ 
+/* Init */
+const sel = document.getElementById("shopSelect");
+Object.entries(SHOPS).forEach(([id,s])=>{
+  const o=document.createElement("option");
+  o.value=id; o.textContent=s.label + (s.items.length? "" : " · ab Juni");
+  sel.appendChild(o);
+});
+sel.addEventListener("change",e=>{currentShop=e.target.value;render();});
+document.getElementById("pufWT").addEventListener("input",render);
+document.getElementById("pufSA").addEventListener("input",render);
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",e=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  e.target.classList.add("active");
+  currentTab=e.target.dataset.tab; render();
+}));
+render();
+</script>
+</body>
+</html>
